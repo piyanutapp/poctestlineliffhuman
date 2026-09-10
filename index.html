@@ -71,7 +71,7 @@
       <form id="appointment-form" class="mock-form">
         <label>หัวข้อนัดหมาย<select id="appointment-topic"><option>สอบถามสัญญา</option><option>ส่งเอกสาร</option><option>ตรวจสอบทรัพย์สิน</option></select></label>
         <label>วันที่ต้องการ<input id="appointment-date" type="date" required></label>
-        <label>ช่วงเวลา<select><option>09:00–12:00 น.</option><option>13:00–16:00 น.</option></select></label>
+        <label>ช่วงเวลา<select id="appointment-time"><option>09:00–12:00 น.</option><option>13:00–16:00 น.</option></select></label>
         <button class="primary-button" type="submit">ยืนยันนัดหมายตัวอย่าง</button>
       </form>
       <div id="appointment-result"></div>
@@ -119,6 +119,7 @@
     <form id="request-form">
       <label>รายละเอียด<textarea id="request-detail" rows="4" required placeholder="กรอกรายละเอียดคำร้อง"></textarea></label>
       <label>เบอร์ติดต่อ<input id="request-phone" type="tel" required placeholder="08x-xxx-xxxx"></label>
+      <label>เอกสารแนบ (Mock)<input id="request-attachment" type="file"></label>
       <button class="primary-button" type="submit">ส่งคำร้องตัวอย่าง</button>
     </form>
   </dialog>

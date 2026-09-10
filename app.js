@@ -11,14 +11,15 @@ function showPanel(id) {
 }
 
 function renderInvoices() {
-  document.getElementById("invoice-list").innerHTML = data.invoices.map((invoice) => `
+  const outstandingInvoices = data.invoices.filter((invoice) => !invoice.isPaid);
+  document.getElementById("invoice-list").innerHTML = outstandingInvoices.length ? outstandingInvoices.map((invoice) => `
     <label class="list-card invoice-card">
       <input type="checkbox" value="${invoice.id}" ${selected.has(invoice.id) ? "checked" : ""}>
       <span class="list-content"><b>${invoice.label}</b><small>${invoice.id} · ครบกำหนด ${invoice.dueDate}</small>
         <em class="status ${invoice.status === "เกินกำหนด" ? "overdue" : ""}">${invoice.status}</em>
       </span>
       <strong>${money.format(invoice.amount)}</strong>
-    </label>`).join("");
+    </label>`).join("") : `<div class="empty-state">ไม่มีรายการค้างชำระ</div>`;
   document.querySelectorAll(".invoice-card input").forEach((checkbox) => checkbox.addEventListener("change", () => {
     checkbox.checked ? selected.add(checkbox.value) : selected.delete(checkbox.value);
     updateSelectedTotal();
@@ -26,24 +27,25 @@ function renderInvoices() {
 }
 
 function updateSelectedTotal() {
-  const total = data.invoices.filter((item) => selected.has(item.id)).reduce((sum, item) => sum + item.amount, 0);
+  const total = data.invoices.filter((item) => !item.isPaid && selected.has(item.id)).reduce((sum, item) => sum + item.amount, 0);
   document.getElementById("selected-total").textContent = money.format(total);
   document.getElementById("qr-total").textContent = money.format(total);
   document.getElementById("create-qr").disabled = total === 0;
 }
 
 function renderStaticData() {
-  const total = data.invoices.reduce((sum, item) => sum + item.amount, 0);
+  const outstandingInvoices = data.invoices.filter((invoice) => !invoice.isPaid);
+  const total = outstandingInvoices.reduce((sum, item) => sum + item.amount, 0);
   document.getElementById("display-name").textContent = data.tenant.name;
   document.getElementById("contract-summary").textContent = `${data.tenant.contract} · ${data.tenant.unit}`;
   document.getElementById("total-balance").textContent = money.format(total);
-  document.getElementById("nearest-due-date").textContent = data.invoices[0].dueDate;
+  document.getElementById("nearest-due-date").textContent = outstandingInvoices[0]?.dueDate ?? "ไม่มีรายการค้างชำระ";
   document.getElementById("document-list").innerHTML = data.documents.map((doc, index) => `
     <button class="list-card document-card" data-document-index="${index}"><span class="doc-icon">▤</span><span class="list-content"><b>${doc.type}</b><small>${doc.number} · ${doc.date}</small></span><span>›</span></button>`).join("");
   document.getElementById("request-types").innerHTML = data.requestTypes.map((type, index) => `
     <button data-request-type="${type}"><span>${["⌂", "▤", "↻", "⌁", "⇄", "↗", "฿", "♙"][index]}</span>${type}</button>`).join("");
   document.getElementById("request-history").innerHTML = data.requests.map((request) => `
-    <div class="list-card"><span class="list-content"><b>${request.type}</b><small>${request.number} · ผู้รับผิดชอบ ${request.owner}</small></span><em class="status">${request.status}</em></div>`).join("");
+    <div class="list-card request-history-card"><span class="list-content"><b>${request.type}</b><small>${request.number} · ผู้รับผิดชอบ ${request.owner}</small><small>${request.result}</small><span class="timeline">${request.timeline.join(" → ")}</span></span><em class="status">${request.status}</em></div>`).join("");
   document.getElementById("payment-history").innerHTML = data.payments.map((payment) => `
     <div class="list-card"><span class="doc-icon">✓</span><span class="list-content"><b>${payment.number}</b><small>${payment.date}</small></span><span class="payment-result"><strong>${money.format(payment.amount)}</strong><em class="status">${payment.status}</em></span></div>`).join("");
   document.getElementById("profile-name").value = data.tenant.name;
@@ -79,18 +81,30 @@ async function initializeLiff() {
 
 document.querySelectorAll(".quick-actions button").forEach((button) => button.addEventListener("click", () => showPanel(button.dataset.target)));
 document.getElementById("toggle-all").addEventListener("click", () => {
-  const shouldSelectAll = selected.size !== data.invoices.length;
+  const outstandingInvoices = data.invoices.filter((invoice) => !invoice.isPaid);
+  const shouldSelectAll = selected.size !== outstandingInvoices.length;
   selected.clear();
-  if (shouldSelectAll) data.invoices.forEach((invoice) => selected.add(invoice.id));
+  if (shouldSelectAll) outstandingInvoices.forEach((invoice) => selected.add(invoice.id));
   renderInvoices(); updateSelectedTotal();
 });
 document.getElementById("pay-all").addEventListener("click", () => {
-  data.invoices.forEach((invoice) => selected.add(invoice.id));
+  data.invoices.filter((invoice) => !invoice.isPaid).forEach((invoice) => selected.add(invoice.id));
   showPanel("invoices"); renderInvoices(); updateSelectedTotal();
 });
 document.getElementById("create-qr").addEventListener("click", () => document.getElementById("qr-dialog").showModal());
 document.getElementById("close-dialog").addEventListener("click", () => document.getElementById("qr-dialog").close());
-document.getElementById("mock-paid").addEventListener("click", () => { document.getElementById("qr-dialog").close(); toast("จำลองการชำระเงินสำเร็จแล้ว"); });
+document.getElementById("mock-paid").addEventListener("click", () => {
+  const paidInvoices = data.invoices.filter((invoice) => selected.has(invoice.id));
+  const amount = paidInvoices.reduce((sum, invoice) => sum + invoice.amount, 0);
+  const receiptNumber = `RC-6909-${randomNumber(7001, 9999)}`;
+  paidInvoices.forEach((invoice) => { invoice.isPaid = true; invoice.status = "ชำระแล้ว"; });
+  data.payments.unshift({ number: receiptNumber, date: "10 ก.ย. 2569", amount, status: "ชำระสำเร็จ", invoiceIds: paidInvoices.map((invoice) => invoice.id) });
+  data.documents.unshift({ type: "ใบเสร็จรับเงิน", number: receiptNumber, date: "10 ก.ย. 2569" });
+  selected.clear();
+  renderStaticData(); renderInvoices(); updateSelectedTotal();
+  document.getElementById("qr-dialog").close();
+  toast(`ชำระสำเร็จและออกใบเสร็จ ${receiptNumber} แล้ว`);
+});
 document.getElementById("request-types").addEventListener("click", (event) => {
   const button = event.target.closest("button[data-request-type]");
   if (!button) return;
@@ -116,7 +130,8 @@ document.getElementById("request-form").addEventListener("submit", (event) => {
   event.preventDefault();
   const type = document.getElementById("request-title").textContent;
   const number = `REQ-6909-${Math.floor(1000 + Math.random() * 9000)}`;
-  data.requests.unshift({ number, type, status: "รับคำร้องแล้ว", owner: "ฝ่ายบริหารทรัพย์สิน" });
+  const attachment = document.getElementById("request-attachment").files[0]?.name;
+  data.requests.unshift({ number, type, status: "รับคำร้องแล้ว", owner: "ฝ่ายบริหารทรัพย์สิน", result: attachment ? `แนบเอกสาร ${attachment}` : "ระบบได้รับรายละเอียดคำร้องแล้ว", timeline: ["รับคำร้อง"] });
   renderStaticData();
   event.target.reset();
   document.getElementById("request-dialog").close();
@@ -125,12 +140,14 @@ document.getElementById("request-form").addEventListener("submit", (event) => {
 document.getElementById("appointment-form").addEventListener("submit", (event) => {
   event.preventDefault();
   const number = `APT-${Math.floor(1000 + Math.random() * 9000)}`;
-  document.getElementById("appointment-result").innerHTML = `<div class="list-card appointment-card"><span class="list-content"><b>นัดหมาย ${number}</b><small>${document.getElementById("appointment-topic").value} · ${document.getElementById("appointment-date").value}</small></span><em class="status">รอยืนยัน</em></div>`;
+  document.getElementById("appointment-result").innerHTML = `<div class="list-card appointment-card"><span class="list-content"><b>นัดหมาย ${number}</b><small>${document.getElementById("appointment-topic").value} · ${document.getElementById("appointment-date").value} · ${document.getElementById("appointment-time").value}</small></span><em class="status">รอยืนยัน</em></div>`;
   toast(`สร้างนัดหมาย ${number} แล้ว`);
 });
 document.getElementById("profile-form").addEventListener("submit", (event) => {
   event.preventDefault();
   data.tenant.name = document.getElementById("profile-name").value;
+  data.tenant.phone = document.getElementById("profile-phone").value;
+  data.tenant.email = document.getElementById("profile-email").value;
   document.getElementById("display-name").textContent = data.tenant.name;
   toast("บันทึกข้อมูลผู้เช่าตัวอย่างแล้ว");
 });
