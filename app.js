@@ -76,7 +76,8 @@ function toast(message) {
 }
 
 async function initializeLiff() {
-  const liffId = new URLSearchParams(window.location.search).get("liffId");
+  const configuredLiffId = "1657128669-1VthmXe7";
+  const liffId = new URLSearchParams(window.location.search).get("liffId") || configuredLiffId;
   if (!liffId || !window.liff) return;
   try {
     await liff.init({ liffId });
