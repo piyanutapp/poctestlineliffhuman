@@ -1,6 +1,7 @@
 const data = window.MRF_MOCK_DATA;
 const money = new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB" });
 const selected = new Set();
+let isLiffReady = false;
 const usedRecordIds = new Set([
   ...data.invoices.map((invoice) => invoice.id),
   ...data.payments.map((payment) => payment.number),
@@ -79,6 +80,7 @@ async function initializeLiff() {
   if (!liffId || !window.liff) return;
   try {
     await liff.init({ liffId });
+    isLiffReady = true;
     if (!liff.isLoggedIn()) { liff.login(); return; }
     const profile = await liff.getProfile();
     data.tenant.name = profile.displayName;
@@ -92,6 +94,33 @@ async function initializeLiff() {
   } catch (error) {
     console.error("LIFF initialization failed", error);
     toast("เปิดในโหมดข้อมูลตัวอย่าง");
+  }
+}
+
+async function sendPaymentConfirmation(paidInvoices, amount, receiptNumber) {
+  if (!isLiffReady || !liff.isInClient()) {
+    return { sent: false, reason: "กรุณาเปิดผ่าน LIFF URL จากห้องแชต LINE" };
+  }
+
+  const context = liff.getContext();
+  if (!context || !["utou", "group", "room"].includes(context.type)) {
+    return { sent: false, reason: "LIFF นี้ไม่ได้เปิดจากห้องแชต" };
+  }
+
+  const invoiceNumbers = paidInvoices.map((invoice) => invoice.id).join(", ");
+  const message = [
+    `คุณชำระบิลจำนวน ${paidInvoices.length} ใบ เป็นยอดเงิน ${money.format(amount)} ให้ MRF เรียบร้อยแล้ว`,
+    `เลขที่บิล: ${invoiceNumbers}`,
+    `เลขที่ใบเสร็จ: ${receiptNumber}`,
+    "ข้อมูลสมมติ DEMO"
+  ].join("\n");
+
+  try {
+    await liff.sendMessages([{ type: "text", text: message }]);
+    return { sent: true };
+  } catch (error) {
+    console.error("Unable to send payment confirmation", error);
+    return { sent: false, reason: "ส่งข้อความเข้าแชตไม่ได้ กรุณาเปิด scope chat_message.write" };
   }
 }
 
@@ -109,7 +138,7 @@ document.getElementById("pay-all").addEventListener("click", () => {
 });
 document.getElementById("create-qr").addEventListener("click", () => document.getElementById("qr-dialog").showModal());
 document.getElementById("close-dialog").addEventListener("click", () => document.getElementById("qr-dialog").close());
-document.getElementById("mock-paid").addEventListener("click", () => {
+document.getElementById("mock-paid").addEventListener("click", async () => {
   const paidInvoices = data.invoices.filter((invoice) => selected.has(invoice.id));
   const amount = paidInvoices.reduce((sum, invoice) => sum + invoice.amount, 0);
   const receiptNumber = createRecordId("RC-6909", 7001, 9999);
@@ -119,7 +148,10 @@ document.getElementById("mock-paid").addEventListener("click", () => {
   selected.clear();
   renderStaticData(); renderInvoices(); updateSelectedTotal();
   document.getElementById("qr-dialog").close();
-  toast(`ชำระสำเร็จและออกใบเสร็จ ${receiptNumber} แล้ว`);
+  const confirmation = await sendPaymentConfirmation(paidInvoices, amount, receiptNumber);
+  toast(confirmation.sent
+    ? `ชำระสำเร็จและส่งข้อความเข้าแชตแล้ว (${receiptNumber})`
+    : `ชำระสำเร็จ แต่${confirmation.reason}`);
 });
 document.getElementById("request-types").addEventListener("click", (event) => {
   const button = event.target.closest("button[data-request-type]");
