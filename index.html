@@ -4,68 +4,68 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#176b5b">
-  <title>เธเธฃเธดเธเธฒเธฃเธเธนเนเน€เธเนเธฒ MRF</title>
+  <title>บริการผู้เช่า MRF</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="topbar">
     <div>
       <p class="eyebrow">MRF TENANT SERVICE</p>
-      <h1>เธชเธงเธฑเธชเธ”เธต <span id="display-name">เธเธธเธ“เธชเธกเธเธฒเธข</span></h1>
-      <p id="contract-summary">เธชเธฑเธเธเธฒ MRF-BKK-00125 ยท เธซเนเธญเธ A-1204</p>
+      <h1>สวัสดี <span id="display-name">คุณสมชาย</span></h1>
+      <p id="contract-summary">สัญญา MRF-BKK-00125 · ห้อง A-1204</p>
     </div>
-    <img id="profile-picture" class="avatar" alt="เธฃเธนเธเนเธเธฃเนเธเธฅเน LINE" hidden>
+    <img id="profile-picture" class="avatar" alt="รูปโปรไฟล์ LINE" hidden>
   </header>
 
   <main>
     <section class="balance-card">
-      <p>เธขเธญเธ”เธเนเธฒเธเธเธณเธฃเธฐเธ—เธฑเนเธเธซเธกเธ”</p>
-      <strong id="total-balance">เธฟ0.00</strong>
-      <span>เธเธฃเธเธเธณเธซเธเธ”เนเธเธฅเนเธ—เธตเนเธชเธธเธ” <b id="nearest-due-date">-</b></span>
-      <button id="pay-all" class="primary-button">เธเธณเธฃเธฐเธ—เธฑเนเธเธชเธฑเธเธเธฒ</button>
+      <p>ยอดค้างชำระทั้งหมด</p>
+      <strong id="total-balance">฿0.00</strong>
+      <span>ครบกำหนดใกล้ที่สุด <b id="nearest-due-date">-</b></span>
+      <button id="pay-all" class="primary-button">ชำระทั้งสัญญา</button>
     </section>
 
-    <nav class="quick-actions" aria-label="เน€เธกเธเธนเธเธฃเธดเธเธฒเธฃ">
-      <button data-target="invoices"><span>เธฟ</span>เธขเธญเธ”เธเนเธฒเธเธเธณเธฃเธฐ</button>
-      <button data-target="documents"><span>โ–ค</span>เน€เธญเธเธชเธฒเธฃ</button>
-      <button data-target="requests"><span>โ•</span>เนเธเนเธเธเธณเธฃเนเธญเธ</button>
+    <nav class="quick-actions" aria-label="เมนูบริการ">
+      <button data-target="invoices"><span>฿</span>ยอดค้างชำระ</button>
+      <button data-target="documents"><span>▤</span>เอกสาร</button>
+      <button data-target="requests"><span>⌕</span>แจ้งคำร้อง</button>
     </nav>
 
     <section id="invoices" class="panel">
       <div class="section-heading">
-        <div><p class="eyebrow">PAYMENT</p><h2>เธฃเธฒเธขเธเธฒเธฃเธ—เธตเนเธ•เนเธญเธเธเธณเธฃเธฐ</h2></div>
-        <button id="toggle-all" class="text-button">เน€เธฅเธทเธญเธเธ—เธฑเนเธเธซเธกเธ”</button>
+        <div><p class="eyebrow">PAYMENT</p><h2>รายการที่ต้องชำระ</h2></div>
+        <button id="toggle-all" class="text-button">เลือกทั้งหมด</button>
       </div>
       <div id="invoice-list" class="stack"></div>
       <div class="sticky-payment">
-        <div><span>เธขเธญเธ”เธ—เธตเนเน€เธฅเธทเธญเธ</span><strong id="selected-total">เธฟ0.00</strong></div>
-        <button id="create-qr" class="primary-button">เธชเธฃเนเธฒเธ QR เธเธณเธฃเธฐเน€เธเธดเธ</button>
+        <div><span>ยอดที่เลือก</span><strong id="selected-total">฿0.00</strong></div>
+        <button id="create-qr" class="primary-button">สร้าง QR ชำระเงิน</button>
       </div>
     </section>
 
     <section id="documents" class="panel" hidden>
-      <div class="section-heading"><div><p class="eyebrow">DOCUMENTS</p><h2>เน€เธญเธเธชเธฒเธฃเธเธญเธเธเธฑเธ</h2></div></div>
+      <div class="section-heading"><div><p class="eyebrow">DOCUMENTS</p><h2>เอกสารของฉัน</h2></div></div>
       <div id="document-list" class="stack"></div>
     </section>
 
     <section id="requests" class="panel" hidden>
-      <div class="section-heading"><div><p class="eyebrow">SERVICE CENTER</p><h2>เนเธเนเธเธเธณเธเธญเธเธฃเธดเธเธฒเธฃ</h2></div></div>
+      <div class="section-heading"><div><p class="eyebrow">SERVICE CENTER</p><h2>แจ้งคำขอบริการ</h2></div></div>
       <div id="request-types" class="request-grid"></div>
-      <h3>เธเธณเธฃเนเธญเธเธฅเนเธฒเธชเธธเธ”</h3>
+      <h3>คำร้องล่าสุด</h3>
       <div id="request-history" class="stack"></div>
     </section>
   </main>
 
   <dialog id="qr-dialog">
-    <button id="close-dialog" class="dialog-close" aria-label="เธเธดเธ”">ร—</button>
+    <button id="close-dialog" class="dialog-close" aria-label="ปิด">×</button>
     <p class="eyebrow">MOCK PAYMENT</p>
-    <h2>เธชเนเธเธเน€เธเธทเนเธญเธเธณเธฃเธฐเน€เธเธดเธ</h2>
-    <div class="qr-placeholder" aria-label="QR Code เธ•เธฑเธงเธญเธขเนเธฒเธ">
-      <span>QR</span><small>เธ•เธฑเธงเธญเธขเนเธฒเธ</small>
+    <h2>สแกนเพื่อชำระเงิน</h2>
+    <div class="qr-placeholder" aria-label="QR Code ตัวอย่าง">
+      <span>QR</span><small>ตัวอย่าง</small>
     </div>
-    <strong id="qr-total">เธฟ0.00</strong>
-    <p class="muted">เธซเธเนเธฒเธเธญเธเธตเนเน€เธเนเธเธเนเธญเธกเธนเธฅเธเธณเธฅเธญเธ เธขเธฑเธเนเธกเนเธกเธตเธเธฒเธฃเธ•เธฑเธ”เน€เธเธดเธเธเธฃเธดเธ</p>
-    <button id="mock-paid" class="primary-button">เธเธณเธฅเธญเธเธงเนเธฒเธเธณเธฃเธฐเธชเธณเน€เธฃเนเธ</button>
+    <strong id="qr-total">฿0.00</strong>
+    <p class="muted">หน้าจอนี้เป็นข้อมูลจำลอง ยังไม่มีการตัดเงินจริง</p>
+    <button id="mock-paid" class="primary-button">จำลองว่าชำระสำเร็จ</button>
   </dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
