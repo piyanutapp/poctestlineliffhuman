@@ -13,9 +13,9 @@
 <body>
   <header class="topbar">
     <div>
-      <p class="eyebrow">MRF TENANT SERVICE</p>
+      <p class="eyebrow">MRF TENANT SERVICE · ข้อมูลสมมติ DEMO</p>
       <h1>สวัสดี <span id="display-name">คุณสมชาย</span></h1>
-      <p id="contract-summary">สัญญา MRF-BKK-00125 · ห้อง A-1204</p>
+      <p id="contract-summary">สัญญา MRF-00125 · ทรัพย์สิน A-1204</p>
     </div>
     <img id="profile-picture" class="avatar" alt="รูปโปรไฟล์ LINE" hidden>
   </header>
@@ -30,8 +30,11 @@
 
     <nav class="quick-actions" aria-label="เมนูบริการ">
       <button data-target="invoices"><span>฿</span>ยอดค้างชำระ</button>
+      <button data-target="history"><span>✓</span>ประวัติชำระ</button>
       <button data-target="documents"><span>▤</span>เอกสาร</button>
       <button data-target="requests"><span>⌕</span>แจ้งคำร้อง</button>
+      <button data-target="appointments"><span>◷</span>นัดหมาย</button>
+      <button data-target="profile"><span>♙</span>โปรไฟล์</button>
     </nav>
 
     <section id="invoices" class="panel">
@@ -46,6 +49,11 @@
       </div>
     </section>
 
+    <section id="history" class="panel" hidden>
+      <div class="section-heading"><div><p class="eyebrow">PAYMENT HISTORY</p><h2>ประวัติการชำระเงิน</h2></div></div>
+      <div id="payment-history" class="stack"></div>
+    </section>
+
     <section id="documents" class="panel" hidden>
       <div class="section-heading"><div><p class="eyebrow">DOCUMENTS</p><h2>เอกสารของฉัน</h2></div></div>
       <div id="document-list" class="stack"></div>
@@ -56,6 +64,27 @@
       <div id="request-types" class="request-grid"></div>
       <h3>คำร้องล่าสุด</h3>
       <div id="request-history" class="stack"></div>
+    </section>
+
+    <section id="appointments" class="panel" hidden>
+      <div class="section-heading"><div><p class="eyebrow">APPOINTMENT</p><h2>นัดหมายเจ้าหน้าที่</h2></div></div>
+      <form id="appointment-form" class="mock-form">
+        <label>หัวข้อนัดหมาย<select id="appointment-topic"><option>สอบถามสัญญา</option><option>ส่งเอกสาร</option><option>ตรวจสอบทรัพย์สิน</option></select></label>
+        <label>วันที่ต้องการ<input id="appointment-date" type="date" required></label>
+        <label>ช่วงเวลา<select><option>09:00–12:00 น.</option><option>13:00–16:00 น.</option></select></label>
+        <button class="primary-button" type="submit">ยืนยันนัดหมายตัวอย่าง</button>
+      </form>
+      <div id="appointment-result"></div>
+    </section>
+
+    <section id="profile" class="panel" hidden>
+      <div class="section-heading"><div><p class="eyebrow">TENANT PROFILE</p><h2>ข้อมูลผู้เช่า</h2></div></div>
+      <form id="profile-form" class="mock-form">
+        <label>ชื่อผู้เช่า<input id="profile-name" required></label>
+        <label>เบอร์ติดต่อ<input id="profile-phone" required></label>
+        <label>อีเมล<input id="profile-email" type="email" required></label>
+        <button class="primary-button" type="submit">บันทึกข้อมูลตัวอย่าง</button>
+      </form>
     </section>
   </main>
 
@@ -71,10 +100,33 @@
     <button id="mock-paid" class="primary-button">จำลองว่าชำระสำเร็จ</button>
   </dialog>
 
+  <dialog id="document-dialog">
+    <button class="dialog-close" data-close-dialog="document-dialog" aria-label="ปิด">×</button>
+    <p class="eyebrow">MOCK DOCUMENT</p>
+    <h2 id="document-title">เอกสาร</h2>
+    <div class="document-preview">
+      <b>มูลนิธิมหามกุฏราชวิทยาลัย</b>
+      <span id="document-number">-</span>
+      <p>เอกสารตัวอย่างสำหรับทดสอบหน้าจอ LIFF</p>
+    </div>
+    <button id="mock-download" class="primary-button">จำลองดาวน์โหลดเอกสาร</button>
+  </dialog>
+
+  <dialog id="request-dialog">
+    <button class="dialog-close" data-close-dialog="request-dialog" aria-label="ปิด">×</button>
+    <p class="eyebrow">MOCK SERVICE REQUEST</p>
+    <h2 id="request-title">แจ้งคำขอบริการ</h2>
+    <form id="request-form">
+      <label>รายละเอียด<textarea id="request-detail" rows="4" required placeholder="กรอกรายละเอียดคำร้อง"></textarea></label>
+      <label>เบอร์ติดต่อ<input id="request-phone" type="tel" required placeholder="08x-xxx-xxxx"></label>
+      <button class="primary-button" type="submit">ส่งคำร้องตัวอย่าง</button>
+    </form>
+  </dialog>
+
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <script src="mock-data.js?v=20260910-2"></script>
-  <script src="app.js?v=20260910-2"></script>
+  <script src="mock-data.js?v=20260910-4"></script>
+  <script src="app.js?v=20260910-4"></script>
 </body>
 </html>
 

@@ -38,12 +38,17 @@ function renderStaticData() {
   document.getElementById("contract-summary").textContent = `${data.tenant.contract} · ${data.tenant.unit}`;
   document.getElementById("total-balance").textContent = money.format(total);
   document.getElementById("nearest-due-date").textContent = data.invoices[0].dueDate;
-  document.getElementById("document-list").innerHTML = data.documents.map((doc) => `
-    <button class="list-card document-card"><span class="doc-icon">▤</span><span class="list-content"><b>${doc.type}</b><small>${doc.number} · ${doc.date}</small></span><span>›</span></button>`).join("");
+  document.getElementById("document-list").innerHTML = data.documents.map((doc, index) => `
+    <button class="list-card document-card" data-document-index="${index}"><span class="doc-icon">▤</span><span class="list-content"><b>${doc.type}</b><small>${doc.number} · ${doc.date}</small></span><span>›</span></button>`).join("");
   document.getElementById("request-types").innerHTML = data.requestTypes.map((type, index) => `
     <button data-request-type="${type}"><span>${["⌂", "▤", "↻", "⌁", "⇄", "↗", "฿", "♙"][index]}</span>${type}</button>`).join("");
   document.getElementById("request-history").innerHTML = data.requests.map((request) => `
     <div class="list-card"><span class="list-content"><b>${request.type}</b><small>${request.number} · ผู้รับผิดชอบ ${request.owner}</small></span><em class="status">${request.status}</em></div>`).join("");
+  document.getElementById("payment-history").innerHTML = data.payments.map((payment) => `
+    <div class="list-card"><span class="doc-icon">✓</span><span class="list-content"><b>${payment.number}</b><small>${payment.date}</small></span><span class="payment-result"><strong>${money.format(payment.amount)}</strong><em class="status">${payment.status}</em></span></div>`).join("");
+  document.getElementById("profile-name").value = data.tenant.name;
+  document.getElementById("profile-phone").value = data.tenant.phone;
+  document.getElementById("profile-email").value = data.tenant.email;
 }
 
 function toast(message) {
@@ -88,9 +93,47 @@ document.getElementById("close-dialog").addEventListener("click", () => document
 document.getElementById("mock-paid").addEventListener("click", () => { document.getElementById("qr-dialog").close(); toast("จำลองการชำระเงินสำเร็จแล้ว"); });
 document.getElementById("request-types").addEventListener("click", (event) => {
   const button = event.target.closest("button[data-request-type]");
-  if (button) toast(`เลือกคำร้อง: ${button.dataset.requestType} (ตัวอย่าง)`);
+  if (!button) return;
+  document.getElementById("request-title").textContent = button.dataset.requestType;
+  document.getElementById("request-dialog").showModal();
 });
-document.getElementById("document-list").addEventListener("click", () => toast("เอกสารตัวอย่าง ยังไม่ได้เชื่อมไฟล์จริง"));
+document.getElementById("document-list").addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-document-index]");
+  if (!button) return;
+  const documentData = data.documents[Number(button.dataset.documentIndex)];
+  document.getElementById("document-title").textContent = documentData.type;
+  document.getElementById("document-number").textContent = `${documentData.number} · ${documentData.date}`;
+  document.getElementById("document-dialog").showModal();
+});
+document.querySelectorAll("[data-close-dialog]").forEach((button) => button.addEventListener("click", () => {
+  document.getElementById(button.dataset.closeDialog).close();
+}));
+document.getElementById("mock-download").addEventListener("click", () => {
+  document.getElementById("document-dialog").close();
+  toast("จำลองการดาวน์โหลดเอกสารเรียบร้อยแล้ว");
+});
+document.getElementById("request-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const type = document.getElementById("request-title").textContent;
+  const number = `REQ-6909-${Math.floor(1000 + Math.random() * 9000)}`;
+  data.requests.unshift({ number, type, status: "รับคำร้องแล้ว", owner: "ฝ่ายบริหารทรัพย์สิน" });
+  renderStaticData();
+  event.target.reset();
+  document.getElementById("request-dialog").close();
+  toast(`ส่งคำร้อง ${number} เรียบร้อยแล้ว`);
+});
+document.getElementById("appointment-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const number = `APT-${Math.floor(1000 + Math.random() * 9000)}`;
+  document.getElementById("appointment-result").innerHTML = `<div class="list-card appointment-card"><span class="list-content"><b>นัดหมาย ${number}</b><small>${document.getElementById("appointment-topic").value} · ${document.getElementById("appointment-date").value}</small></span><em class="status">รอยืนยัน</em></div>`;
+  toast(`สร้างนัดหมาย ${number} แล้ว`);
+});
+document.getElementById("profile-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  data.tenant.name = document.getElementById("profile-name").value;
+  document.getElementById("display-name").textContent = data.tenant.name;
+  toast("บันทึกข้อมูลผู้เช่าตัวอย่างแล้ว");
+});
 
 renderStaticData(); renderInvoices(); updateSelectedTotal(); initializeLiff();
 
