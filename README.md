@@ -1,6 +1,6 @@
-# MRF Tenant Service LIFF
+# TEST Tenant Service LIFF
 
-Static LIFF proof of concept for MRF tenant services.
+Static LIFF proof of concept for TEST tenant services.
 
 ## Demo
 
