@@ -1,6 +1,20 @@
 const data = window.MRF_MOCK_DATA;
 const money = new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB" });
 const selected = new Set();
+const usedRecordIds = new Set([
+  ...data.invoices.map((invoice) => invoice.id),
+  ...data.payments.map((payment) => payment.number),
+  ...data.requests.map((request) => request.number)
+]);
+
+function createRecordId(prefix, min = 1000, max = 9999) {
+  let id;
+  do {
+    id = `${prefix}-${randomNumber(min, max)}`;
+  } while (usedRecordIds.has(id));
+  usedRecordIds.add(id);
+  return id;
+}
 
 function showPanel(id) {
   document.querySelectorAll("main .panel").forEach((panel) => { panel.hidden = panel.id !== id; });
@@ -67,7 +81,9 @@ async function initializeLiff() {
     await liff.init({ liffId });
     if (!liff.isLoggedIn()) { liff.login(); return; }
     const profile = await liff.getProfile();
+    data.tenant.name = profile.displayName;
     document.getElementById("display-name").textContent = profile.displayName;
+    document.getElementById("profile-name").value = profile.displayName;
     if (profile.pictureUrl) {
       const image = document.getElementById("profile-picture");
       image.src = profile.pictureUrl;
@@ -96,7 +112,7 @@ document.getElementById("close-dialog").addEventListener("click", () => document
 document.getElementById("mock-paid").addEventListener("click", () => {
   const paidInvoices = data.invoices.filter((invoice) => selected.has(invoice.id));
   const amount = paidInvoices.reduce((sum, invoice) => sum + invoice.amount, 0);
-  const receiptNumber = `RC-6909-${randomNumber(7001, 9999)}`;
+  const receiptNumber = createRecordId("RC-6909", 7001, 9999);
   paidInvoices.forEach((invoice) => { invoice.isPaid = true; invoice.status = "ชำระแล้ว"; });
   data.payments.unshift({ number: receiptNumber, date: "10 ก.ย. 2569", amount, status: "ชำระสำเร็จ", invoiceIds: paidInvoices.map((invoice) => invoice.id) });
   data.documents.unshift({ type: "ใบเสร็จรับเงิน", number: receiptNumber, date: "10 ก.ย. 2569" });
@@ -129,7 +145,7 @@ document.getElementById("mock-download").addEventListener("click", () => {
 document.getElementById("request-form").addEventListener("submit", (event) => {
   event.preventDefault();
   const type = document.getElementById("request-title").textContent;
-  const number = `REQ-6909-${Math.floor(1000 + Math.random() * 9000)}`;
+  const number = createRecordId("REQ-6909");
   const attachment = document.getElementById("request-attachment").files[0]?.name;
   data.requests.unshift({ number, type, status: "รับคำร้องแล้ว", owner: "ฝ่ายบริหารทรัพย์สิน", result: attachment ? `แนบเอกสาร ${attachment}` : "ระบบได้รับรายละเอียดคำร้องแล้ว", timeline: ["รับคำร้อง"] });
   renderStaticData();
@@ -139,7 +155,7 @@ document.getElementById("request-form").addEventListener("submit", (event) => {
 });
 document.getElementById("appointment-form").addEventListener("submit", (event) => {
   event.preventDefault();
-  const number = `APT-${Math.floor(1000 + Math.random() * 9000)}`;
+  const number = createRecordId("APT");
   document.getElementById("appointment-result").innerHTML = `<div class="list-card appointment-card"><span class="list-content"><b>นัดหมาย ${number}</b><small>${document.getElementById("appointment-topic").value} · ${document.getElementById("appointment-date").value} · ${document.getElementById("appointment-time").value}</small></span><em class="status">รอยืนยัน</em></div>`;
   toast(`สร้างนัดหมาย ${number} แล้ว`);
 });
