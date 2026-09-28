@@ -17,12 +17,27 @@ function createRecordId(prefix, min = 1000, max = 9999) {
   return id;
 }
 
-function showPanel(id) {
+function showPanel(id, { updateUrl = true } = {}) {
+  const targetPanel = document.getElementById(id);
+  if (!targetPanel || !targetPanel.classList.contains("panel")) return;
   document.querySelectorAll("main .panel").forEach((panel) => { panel.hidden = panel.id !== id; });
   document.querySelectorAll(".quick-actions button").forEach((button) => {
     button.classList.toggle("active", button.dataset.target === id);
   });
-  document.getElementById(id).scrollIntoView({ behavior: "smooth", block: "start" });
+  if (updateUrl) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("panel", id);
+    window.history.replaceState({}, "", url);
+  }
+  targetPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function resolveInitialPanel() {
+  const params = new URLSearchParams(window.location.search);
+  const requestedPanel = params.get("panel") || params.get("page");
+  return requestedPanel && document.getElementById(requestedPanel)?.classList.contains("panel")
+    ? requestedPanel
+    : "invoices";
 }
 
 function renderInvoices() {
@@ -201,5 +216,4 @@ document.getElementById("profile-form").addEventListener("submit", (event) => {
   toast("บันทึกข้อมูลผู้เช่าตัวอย่างแล้ว");
 });
 
-renderStaticData(); renderInvoices(); updateSelectedTotal(); initializeLiff();
-
+renderStaticData(); renderInvoices(); updateSelectedTotal(); showPanel(resolveInitialPanel(), { updateUrl: false }); initializeLiff();
