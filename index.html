@@ -8,7 +8,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>บริการผู้เช่า MRF</title>
-  <link rel="stylesheet" href="styles.css?v=20260928-1">
+  <link rel="stylesheet" href="styles.css?v=20260928-4">
 </head>
 <body>
   <header class="topbar">
@@ -35,8 +35,6 @@
       <button data-target="requests"><span>⌕</span>แจ้งคำร้อง</button>
       <button data-target="appointments"><span>◷</span>นัดหมาย</button>
       <button data-target="profile"><span>♙</span>โปรไฟล์</button>
-      <button data-target="howto"><span>☰</span>วิธีการใช้งาน</button>
-      <button data-target="contact"><span>✆</span>ติดต่อเรา</button>
     </nav>
 
     <section id="invoices" class="panel">
@@ -89,70 +87,6 @@
       </form>
     </section>
 
-    <section id="howto" class="panel" hidden>
-      <div class="section-heading"><div><p class="eyebrow">HOW TO USE</p><h2>วิธีการใช้งาน</h2></div></div>
-      <div class="stack">
-        <article class="info-card">
-          <span class="step-badge">1</span>
-          <div class="list-content">
-            <b>เปิดเมนูที่ต้องการจาก LINE</b>
-            <small>แตะ Rich Menu หรือปุ่มลิงก์ LIFF เพื่อเข้าสู่หน้าบริการที่เกี่ยวข้องได้ทันที</small>
-          </div>
-        </article>
-        <article class="info-card">
-          <span class="step-badge">2</span>
-          <div class="list-content">
-            <b>ตรวจสอบข้อมูลและดำเนินการ</b>
-            <small>คุณสามารถดูยอดค้างชำระ เอกสาร แจ้งคำร้อง นัดหมาย และแก้ไขข้อมูลผู้เช่าได้ในหน้าเดียวกัน</small>
-          </div>
-        </article>
-        <article class="info-card">
-          <span class="step-badge">3</span>
-          <div class="list-content">
-            <b>บันทึกหรือส่งคำร้องตามขั้นตอน</b>
-            <small>เมื่อทำรายการสำเร็จ ระบบตัวอย่างจะแสดงสถานะหรือข้อความยืนยันบนหน้าจอ</small>
-          </div>
-        </article>
-      </div>
-      <div class="tip-box">
-        <b>คำแนะนำเพิ่มเติม</b>
-        <p>หากต้องการให้ปุ่มใน LINE เปิดหน้านี้โดยตรง สามารถใช้ลิงก์ LIFF เดิมแล้วต่อพารามิเตอร์ <code>?panel=howto</code></p>
-      </div>
-    </section>
-
-    <section id="contact" class="panel" hidden>
-      <div class="section-heading"><div><p class="eyebrow">CONTACT</p><h2>ติดต่อเรา</h2></div></div>
-      <div class="stack">
-        <a class="list-card contact-card" href="tel:021234567">
-          <span class="doc-icon">☎</span>
-          <span class="list-content">
-            <b>โทรศัพท์สำนักงาน</b>
-            <small>02-123-4567 วันจันทร์–ศุกร์ เวลา 08:30–17:30 น.</small>
-          </span>
-          <span>›</span>
-        </a>
-        <a class="list-card contact-card" href="mailto:tenantservice@mrf.example.com">
-          <span class="doc-icon">✉</span>
-          <span class="list-content">
-            <b>อีเมลฝ่ายบริการผู้เช่า</b>
-            <small>tenantservice@mrf.example.com</small>
-          </span>
-          <span>›</span>
-        </a>
-        <a class="list-card contact-card" href="https://line.me/ti/p/@mrf-demo" target="_blank" rel="noreferrer">
-          <span class="doc-icon">LINE</span>
-          <span class="list-content">
-            <b>LINE Official Account</b>
-            <small>@mrf-demo สำหรับสอบถามข้อมูลเพิ่มเติม</small>
-          </span>
-          <span>›</span>
-        </a>
-      </div>
-      <div class="tip-box">
-        <b>ลิงก์ตรงสำหรับเมนู LINE</b>
-        <p>หากต้องการให้ปุ่มใน LINE เปิดหน้านี้โดยตรง ใช้ลิงก์ LIFF เดิมแล้วต่อพารามิเตอร์ <code>?panel=contact</code></p>
-      </div>
-    </section>
   </main>
 
   <dialog id="qr-dialog">
@@ -193,7 +127,7 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <script src="mock-data.js?v=20260928-1"></script>
-  <script src="app.js?v=20260928-1"></script>
+  <script src="mock-data.js?v=20260928-4"></script>
+  <script src="app.js?v=20260928-4"></script>
 </body>
 </html>
