@@ -35,7 +35,14 @@ main { max-width:720px; margin:-40px auto 50px; padding:0 16px; }
 .sticky-payment span { color:var(--muted); font-size:.75rem; }
 .sticky-payment .primary-button { margin:0; }
 .document-card { cursor:pointer; }
+.contact-card { text-decoration:none; }
 .doc-icon { display:grid; place-items:center; width:38px; height:38px; border-radius:11px; color:var(--green); background:var(--mint); }
+.info-card { display:flex; gap:12px; align-items:flex-start; padding:16px; border:1px solid var(--line); border-radius:14px; background:white; }
+.step-badge { display:grid; place-items:center; min-width:38px; height:38px; border-radius:11px; color:white; background:var(--green); font-weight:800; }
+.tip-box { margin-top:16px; padding:16px; border:1px solid var(--line); border-radius:16px; background:linear-gradient(180deg,#fff,var(--mint)); }
+.tip-box b { display:block; margin-bottom:6px; }
+.tip-box p { margin:0; color:var(--muted); line-height:1.5; }
+.tip-box code { padding:2px 6px; border-radius:8px; background:white; color:var(--green-dark); font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
 .request-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
 .request-grid button { min-height:92px; }
 .payment-result { display:flex; align-items:flex-end; flex-direction:column; gap:5px; }
@@ -60,4 +67,5 @@ dialog::backdrop { background:rgba(10,25,21,.62); backdrop-filter:blur(3px); }
 .toast { position:fixed; left:50%; bottom:24px; z-index:10; max-width:88vw; padding:11px 16px; border-radius:999px; color:white; background:#182a26; opacity:0; transform:translate(-50%,20px); transition:.2s; pointer-events:none; }
 .toast.show { opacity:1; transform:translate(-50%,0); }
 [hidden] { display:none !important; }
+@media (max-width:520px) { .quick-actions { grid-template-columns:repeat(2,1fr); } }
 @media (min-width:721px) { .sticky-payment { left:50%; right:auto; width:688px; transform:translateX(-50%); } }
