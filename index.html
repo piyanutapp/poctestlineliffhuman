@@ -8,9 +8,15 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>บริการผู้เช่า MRF</title>
-  <link rel="stylesheet" href="styles.css?v=20260928-4">
+  <link rel="stylesheet" href="styles.css?v=20260928-5">
 </head>
-<body>
+<body class="is-booting">
+  <div id="app-loading" class="app-loading" role="status" aria-live="polite">
+    <div class="loading-brand">MRF</div>
+    <strong>Tenant Service</strong>
+    <span>กำลังเปิดบริการ...</span>
+    <div class="loading-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+  </div>
   <header class="topbar">
     <div>
       <p class="eyebrow">MRF TENANT SERVICE · ข้อมูลสมมติ DEMO</p>
@@ -93,8 +99,15 @@
     <button id="close-dialog" class="dialog-close" aria-label="ปิด">×</button>
     <p class="eyebrow">MOCK PAYMENT</p>
     <h2>สแกนเพื่อชำระเงิน</h2>
-    <div class="qr-placeholder" aria-label="QR Code ตัวอย่าง">
-      <span>QR</span><small>ตัวอย่าง</small>
+    <div class="mock-qr-card" aria-label="QR Code ตัวอย่างสำหรับ Demo">
+      <div class="mock-qr-frame">
+        <canvas id="mock-qr-canvas" width="232" height="232" aria-hidden="true"></canvas>
+        <span class="mock-qr-badge">DEMO</span>
+      </div>
+      <div class="mock-qr-meta">
+        <strong>MRF Tenant Service</strong>
+        <small>QR ตัวอย่างสำหรับการสาธิต · ไม่ใช่ QR ชำระเงินจริง</small>
+      </div>
     </div>
     <strong id="qr-total">฿0.00</strong>
     <p class="muted">หน้าจอนี้เป็นข้อมูลจำลอง ยังไม่มีการตัดเงินจริง</p>
@@ -127,7 +140,7 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <script src="mock-data.js?v=20260928-4"></script>
-  <script src="app.js?v=20260928-4"></script>
+  <script src="mock-data.js?v=20260928-5"></script>
+  <script src="app.js?v=20260928-5"></script>
 </body>
 </html>
