@@ -32,6 +32,24 @@ function showPanel(id, { updateUrl = true } = {}) {
   targetPanel.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+
+function redirectLegacyPageLinks() {
+  const params = new URLSearchParams(window.location.search);
+  const requestedPage = params.get("panel") || params.get("page");
+
+  if (requestedPage === "howto") {
+    window.location.replace("./howto/");
+    return true;
+  }
+
+  if (requestedPage === "contact") {
+    window.location.replace("./contact/");
+    return true;
+  }
+
+  return false;
+}
+
 function resolveInitialPanel() {
   const params = new URLSearchParams(window.location.search);
   const requestedPanel = params.get("panel") || params.get("page");
@@ -216,4 +234,10 @@ document.getElementById("profile-form").addEventListener("submit", (event) => {
   toast("บันทึกข้อมูลผู้เช่าตัวอย่างแล้ว");
 });
 
-renderStaticData(); renderInvoices(); updateSelectedTotal(); showPanel(resolveInitialPanel(), { updateUrl: false }); initializeLiff();
+if (!redirectLegacyPageLinks()) {
+  renderStaticData();
+  renderInvoices();
+  updateSelectedTotal();
+  showPanel(resolveInitialPanel(), { updateUrl: false });
+  initializeLiff();
+}
