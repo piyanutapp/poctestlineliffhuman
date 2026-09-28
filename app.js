@@ -111,24 +111,124 @@ function toast(message) {
 async function initializeLiff() {
   const configuredLiffId = "1657128669-1VthmXe7";
   const liffId = new URLSearchParams(window.location.search).get("liffId") || configuredLiffId;
-  if (!liffId || !window.liff) return;
+  if (!liffId || !window.liff) return false;
+
   try {
     await liff.init({ liffId });
     isLiffReady = true;
-    if (!liff.isLoggedIn()) { liff.login(); return; }
+
+    if (!liff.isLoggedIn()) {
+      liff.login();
+      return true;
+    }
+
     const profile = await liff.getProfile();
     data.tenant.name = profile.displayName;
     document.getElementById("display-name").textContent = profile.displayName;
     document.getElementById("profile-name").value = profile.displayName;
+
     if (profile.pictureUrl) {
       const image = document.getElementById("profile-picture");
       image.src = profile.pictureUrl;
       image.hidden = false;
     }
+
+    return true;
   } catch (error) {
     console.error("LIFF initialization failed", error);
-    toast("เปิดในโหมดข้อมูลตัวอย่าง");
+    return false;
   }
+}
+
+
+function resolveLiffDestination() {
+  const params = new URLSearchParams(window.location.search);
+  const liffState = params.get("liff.state");
+
+  if (!liffState) return null;
+
+  let decoded = liffState;
+  try {
+    decoded = decodeURIComponent(liffState);
+  } catch (_) {
+    // Keep the original value if LINE already supplied a decoded state.
+  }
+
+  if (decoded.includes("/howto")) return "./howto/";
+  if (decoded.includes("/contact")) return "./contact/";
+  return null;
+}
+
+function showApp() {
+  document.body.classList.remove("is-booting");
+  document.body.classList.add("is-ready");
+  document.getElementById("app-loading")?.setAttribute("aria-hidden", "true");
+}
+
+function drawMockQr() {
+  const canvas = document.getElementById("mock-qr-canvas");
+  if (!canvas) return;
+
+  const context = canvas.getContext("2d");
+  const modules = 29;
+  const moduleSize = canvas.width / modules;
+  const reserved = Array.from({ length: modules }, () => Array(modules).fill(false));
+
+  context.imageSmoothingEnabled = false;
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  function paintModule(row, col, dark = true) {
+    context.fillStyle = dark ? "#102a24" : "#ffffff";
+    context.fillRect(
+      Math.round(col * moduleSize),
+      Math.round(row * moduleSize),
+      Math.ceil(moduleSize),
+      Math.ceil(moduleSize)
+    );
+  }
+
+  function reserveArea(top, left, height, width) {
+    for (let row = Math.max(0, top); row < Math.min(modules, top + height); row += 1) {
+      for (let col = Math.max(0, left); col < Math.min(modules, left + width); col += 1) {
+        reserved[row][col] = true;
+      }
+    }
+  }
+
+  function drawFinder(top, left) {
+    reserveArea(top - 1, left - 1, 9, 9);
+    for (let row = 0; row < 7; row += 1) {
+      for (let col = 0; col < 7; col += 1) {
+        const border = row === 0 || row === 6 || col === 0 || col === 6;
+        const center = row >= 2 && row <= 4 && col >= 2 && col <= 4;
+        paintModule(top + row, left + col, border || center);
+      }
+    }
+  }
+
+  drawFinder(0, 0);
+  drawFinder(0, modules - 7);
+  drawFinder(modules - 7, 0);
+
+  let seed = 690917;
+  function nextBit(row, col) {
+    seed = (seed * 1664525 + 1013904223 + row * 31 + col * 17) >>> 0;
+    return ((seed >>> 28) & 1) === 1;
+  }
+
+  for (let row = 0; row < modules; row += 1) {
+    for (let col = 0; col < modules; col += 1) {
+      if (reserved[row][col]) continue;
+      if ((row + col) % 11 === 0 || nextBit(row, col)) {
+        paintModule(row, col, true);
+      }
+    }
+  }
+
+  // Deliberately cover the center so this remains a visual mock-up, not a payment QR.
+  context.fillStyle = "#ffffff";
+  context.fillRect(88, 88, 56, 56);
 }
 
 async function sendPaymentConfirmation(paidInvoices, amount, receiptNumber) {
@@ -234,10 +334,33 @@ document.getElementById("profile-form").addEventListener("submit", (event) => {
   toast("บันทึกข้อมูลผู้เช่าตัวอย่างแล้ว");
 });
 
-if (!redirectLegacyPageLinks()) {
+async function bootstrap() {
+  const legacyDestination = (() => {
+    const params = new URLSearchParams(window.location.search);
+    const page = params.get("panel") || params.get("page");
+    if (page === "howto") return "./howto/";
+    if (page === "contact") return "./contact/";
+    return null;
+  })();
+
+  await initializeLiff();
+
+  const destination = resolveLiffDestination() || legacyDestination;
+  if (destination) {
+    window.location.replace(destination);
+    return;
+  }
+
   renderStaticData();
   renderInvoices();
   updateSelectedTotal();
+  drawMockQr();
   showPanel(resolveInitialPanel(), { updateUrl: false });
-  initializeLiff();
+  showApp();
+
+  if (!isLiffReady) {
+    toast("เปิดในโหมดข้อมูลตัวอย่าง");
+  }
 }
+
+bootstrap();
